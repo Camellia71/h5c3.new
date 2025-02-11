@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>伪元素选择器</title>
+    <style>
+        div {
+            width: 200px;
+            height: 200px;
+            background-color: pink;
+        }
+
+        /* div::after权重是2 */
+        div::before {
+            display: inline-block;
+            content: 'wo';
+            width: 30px;
+            height: 40px;
+            background-color: purple;
+        }
+
+        div::after {
+            content: 'pig';
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        是
+    </div>
+</body>
+
+</html>
