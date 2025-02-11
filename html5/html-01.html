@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML5 新增的语义化标签</title>
+    <style>
+        header,
+        nav,
+        footer {
+            width: 800px;
+            height: 120px;
+            background-color: pink;
+            border-radius: 15px;
+            margin: 15px auto;
+        }
+
+        div {
+            position: relative;
+            width: 800px;
+            height: 300px;
+            margin: 15px auto;
+        }
+
+        section,
+        aside {
+            position: absolute;
+            width: 395px;
+            height: 300px;
+            background-color: skyblue;
+            border-radius: 15px;
+        }
+
+        section {
+            left: 0;
+            top: 0;
+        }
+
+        aside {
+            right: 0;
+            top: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <header>头部标签</header>
+    <nav>导航栏标签</nav>
+    <div>
+        <section>某个区域</section>
+        <aside>侧边栏</aside>
+    </div>
+    <footer>尾部</footer>
+</body>
+
+</html>

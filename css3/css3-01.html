@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>属性选择器</title>
+    <style>
+        /* 具有value属性的input */
+        input[value] {
+            color: pink;
+        }
+
+        input[type="password"] {
+            color: skyblue;
+        }
+
+        /* 选择具有class属性且属性值是icon开头的div */
+        div[class^=icon] {
+            color: red;
+        }
+
+        section[class$=data] {
+            color: blue;
+        }
+
+        div[class*=came] {
+            color: green;
+        }
+    </style>
+</head>
+
+<body>
+    <input type="text" value="请输入用户名">
+    <input type="text"><br />
+
+    <input type="text" name="" id="">
+    <input type="password" name="" id=""><br />
+
+    <div class="icon1">1</div>
+    <div class="icon2">2</div>
+    <div class="icon3">3</div>
+    <div class="icon4">4</div>
+    <div>5</div><br />
+
+    <section class="xixi-data">11</section>
+    <section class="yiyi-data">22</section>
+    <section class="xixi-datt">33</section><br />
+
+    <div class="camecame">1</div>
+    <div class="zhangcameqiyi">2</div>
+    <div class="qicame">3</div>
+    <div class="yiame">4</div>
+
+</body>
+
+</html>

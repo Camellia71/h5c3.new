@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nth-child</title>
+    <style>
+        ol li:nth-child(2n) {
+            background-color: pink;
+        }
+
+        ol li:nth-child(2n+1) {
+            background-color: skyblue;
+        }
+
+        ol li:nth-child(-n+5) {
+            background-color: yellowgreen;
+        }
+    </style>
+</head>
+
+<body>
+    <ol>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+    </ol>
+</body>
+
+</html>
