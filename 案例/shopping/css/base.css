@@ -2,6 +2,7 @@
 * {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
 /* 斜体的文字不倾斜 */
@@ -40,6 +41,9 @@ button,
 input {
     /* "\5B8B\4F53"就是宋体的意思，这样浏览器兼容性比较好 */
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif, "\5B8B\4F53";
+    /* 手动去除边框 */
+    border: 0;
+    outline: none;
 }
 
 body {
