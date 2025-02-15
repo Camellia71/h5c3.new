@@ -35,5 +35,5 @@
 }
 
 .arrow-icon::after {
-    content: '1';
+    content: '';
 }
