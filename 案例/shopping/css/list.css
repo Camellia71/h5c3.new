@@ -1,0 +1,135 @@
+/* 列表专有的css */
+.nav {
+    overflow: hidden;
+}
+
+.sk {
+    position: absolute;
+    left: 180px;
+    top: 40px;
+}
+
+.sk_list {
+    float: left;
+}
+
+.sk_list ul li {
+    float: left;
+}
+
+.sk_list ul li a {
+    display: block;
+    line-height: 47px;
+    padding: 0 30px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #000;
+}
+
+.sk_con {
+    float: left;
+}
+
+.sk_con ul li {
+    float: left;
+}
+
+.sk_con ul li a {
+    display: block;
+    line-height: 48px;
+    padding: 0 20px;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.sk_con ul li:last-child a::after {
+    font-family: 'icomoon';
+    content: '\e901';
+}
+
+.sk_bd {
+    height: 2000px;
+}
+
+.sk_bd ul li {
+    float: left;
+    width: 290px;
+    height: 460px;
+    margin: 12px 5px;
+    border: 1px solid transparent;
+}
+
+.sk_bd ul li:hover {
+    border: 1px solid red;
+}
+
+.box {
+    width: 288px;
+    height: 450px;
+    background-color: #fff;
+    margin: 10px auto;
+}
+
+.box img {
+    margin-top: 30px;
+    margin-left: 28px;
+}
+
+.box .text {
+    color: gray;
+    font-size: 12px;
+    padding: 30px 30px 10px 30px;
+}
+
+.price1 {
+    color: rgb(179, 25, 27);
+    font-size: 18px;
+    background-color: #fff;
+    padding-left: 30px;
+}
+
+.price2 {
+    color: gray;
+    font-size: 12px;
+    text-decoration: line-through;
+    font-weight: 700;
+}
+
+.nav {
+    color: gray;
+    font-size: 10px;
+    padding-left: 30px;
+    padding-top: 10px;
+}
+
+.nav .shuzi {
+    color: red;
+}
+
+.nav .jindu {
+    display: inline-block;
+    height: 10px;
+    width: 125px;
+    border: 1px solid red;
+    border-radius: 5px;
+}
+
+.nav .jindu .jindu-in {
+    float: left;
+    display: inline-block;
+    height: 100%;
+    width: 85%;
+    background-color: red;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+.dianji {
+    width: 240px;
+    height: 40px;
+    background-color: rgb(179, 25, 27);
+    margin: 3px auto;
+    color: #fff;
+    line-height: 40px;
+    text-align: center;
+}
