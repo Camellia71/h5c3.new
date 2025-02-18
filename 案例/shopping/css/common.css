@@ -178,7 +178,7 @@
 }
 
 .dropdown .dd {
-    display: none;
+    /* display: none; */
     width: 210px;
     height: 465px;
     background-color: #c81623;
@@ -286,4 +286,22 @@
 .mod_help dl dt {
     font-size: 14px;
     margin-bottom: 10px;
+}
+
+.mod_copyright {
+    text-align: center;
+    padding-top: 20px;
+}
+
+.links {
+    margin-bottom: 15px;
+}
+
+.links a {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.copyright {
+    line-height: 20px;
 }
