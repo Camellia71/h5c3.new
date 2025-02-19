@@ -53,7 +53,7 @@ header {
     text-align: right;
 }
 
-.reg_form ul li input {
+.reg_form ul li .inp {
     width: 242px;
     height: 37px;
     border: 1px solid #ccc;
@@ -79,4 +79,64 @@ header {
 
 .success_icon {
     background: url(../image/success_06.png) no-repeat;
+}
+
+.safe {
+    padding-left: 170px;
+}
+
+.safe em {
+    padding: 0 12px;
+    color: #fff;
+}
+
+.ruo {
+    background-color: #de1111;
+}
+
+.zhong {
+    background-color: #40b83f;
+}
+
+.qiang {
+    background-color: #f79100;
+}
+
+.agree {
+    padding-left: 95px;
+}
+
+.agree input {
+    vertical-align: middle;
+}
+
+.agree a {
+    color: #1ba1e6;
+}
+
+.btn {
+    width: 200px;
+    height: 34px;
+    background-color: #c81623;
+    font-size: 14px;
+    color: #fff;
+    margin: 30px 0 0 100px;
+}
+
+.mod_copyright {
+    text-align: center;
+    padding-top: 20px;
+}
+
+.links {
+    margin-bottom: 15px;
+}
+
+.links a {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.copyright {
+    line-height: 20px;
 }
