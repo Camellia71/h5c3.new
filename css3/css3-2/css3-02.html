@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,6 +13,7 @@
             /* 我们translate里边的百分号是盒子本身的宽度或高度做对比 */
             transform: translateX(50%);
         }
+
         p {
             position: absolute;
             top: 50%;
@@ -19,18 +21,21 @@
             width: 200px;
             height: 200px;
             background-color: purple;
-            transform: translate(-50%,-50%);
+            transform: translate(-50%, -50%);
         }
+
         span {
             /* translate对行内元素无效  */
-            transform: translate(300px,300px);
+            transform: translate(300px, 300px);
         }
     </style>
 </head>
+
 <body>
     <div>
         <p></p>
     </div>
     <span>123</span>
 </body>
+
 </html>
