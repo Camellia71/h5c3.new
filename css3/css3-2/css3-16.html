@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        div {
+            width: 0;
+            height: 30px;
+            background-color: pink;
+            font-size: 20px;
+            white-space: nowrap;
+            overflow: hidden;
+            /* steps 就是分几步完成动画 */
+            animation: move 4s steps(10) forwards;
+        }
+
+        @keyframes move {
+            0% {
+                width: 0;
+            }
+
+            100% {
+                width: 200px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div>世纪佳缘他在这里等你</div>
+</body>
+
+</html>
