@@ -1,11 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <style>
+        body {
+            /* 透视写到被观察元素的父盒子里 */
+            perspective: 200px;
+        }
+
+        div {
+            width: 200px;
+            height: 200px;
+            background-color: pink;
+            /* transform: translateX(100px);
+            transform: translateY(100px); */
+
+            /* transform: translateX(100px) translateY(100px) translateZ(100px); */
+
+            /* 1.translateZ 沿着Z轴移动
+            2.后面的单位一般跟px
+            3.这个表示向外移动100px
+            4.3D有简写的写法 */
+            /* transform: translate3d(x,y,z); */
+            transform: translate3d(400px, 100px, 100px);
+            /* 5.x,y,z不能省略，写 0 */
+        }
+    </style>
 </head>
+
 <body>
-    
+    <div></div>
 </body>
+
 </html>
