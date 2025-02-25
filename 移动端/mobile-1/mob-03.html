@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        /* 我们需要一个50*50(css像素)的图片,放在iPhone8中会放大两倍 */
+        /* 所以我们用100*100(css像素)的图片,手动缩小至50*50(css像素) */
+        /* 这就是2倍图 */
+        img:nth-child(2) {
+            width: 50px;
+            height: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 模糊 -->
+    <img src="../images/apple50.jpg" alt="">
+    <!-- 清晰 -->
+    <img src="../images/apple100.jpg" alt="">
+</body>
+
+</html>
