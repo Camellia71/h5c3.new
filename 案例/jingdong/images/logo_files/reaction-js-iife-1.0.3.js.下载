@@ -1,0 +1,717 @@
+/* eslint-disable */
+/**
+ * @file: 版本控制配置
+ * @Author: liushaozhang
+ * @Date:   2020-04-01 11:15:51
+ */
+/**
+ * GRM(global react monitor)
+ * 抽离对于行为和反应的判断，根据行为的指定反应进行分级上报。
+ * 通过初始化抹平商业化api请求返回差异，进行统一上报
+ * 分割监控与上报能力，上报收口到专门的sdk
+*/
+(function () {
+    var debug = true;
+    var grmlog = function (msg, code) {
+        debug && window.console && window.console.log && window.console.log(msg);
+        try{
+            window.GRM_LOG.push(msg);
+        }
+        catch(err){}
+        return (is('Number', code) && code) || -1;
+    };
+    function is(cluster, value) {
+        var flag = Object.prototype.toString.call(value) === ('[object ' + cluster + ']');
+        return flag;
+    };
+    function isNot(cluster, value) {
+        return !is(cluster, value);
+    };
+    /**
+     * 简易Sizzle选择器，用于判断Dom
+    */
+    var _$ = function (selector, context) {
+        return new _$.fn.init(selector, context);
+    }
+    _$.fn = _$.prototype = {
+        constructor: _$,
+        length: 0,
+        init: function (selector, context) {
+            context = context || document;
+            this.context = context;
+            this.selector = selector;
+            var elementName = selector.slice(1);
+            if (~selector.indexOf("#")) {
+                this[0] = context.getElementById(elementName);
+                this.length = +!!this[0];
+                return this;
+            }
+            if (~selector.indexOf(".") && context.getElementsByClassName) {
+                var classDom = context.getElementsByClassName(elementName);
+                this[0] = classDom;
+                this.length = classDom.length;
+                return this;
+            }
+            if (~selector.indexOf(".")) {
+                var allItems = document.getElementsByTagName("*");
+                var newArr = [];
+                for (var i = 0; i < allItems.length; i++) {
+                    var classNames = allItems[i].className;
+                    var arrClass = classNames.split(" ");
+                    for (var j = 0; j < arrClass.length; j++) {
+                        if (arrClass[j] == elementName) {
+                            newArr.push(allItems[i]);
+                        }
+                    }
+                }
+                this[0] = newArr;
+                this.length = newArr.length;
+                return this;
+            }
+            var doms = context.getElementsByTagName(selector),
+                i = 0,
+                len = doms.length;
+            for (; i < len; i++) {
+                this[i] = doms[i];
+            }
+            this.length = len;
+            return this;
+        }
+    }
+    _$.fn.init.prototype = _$.fn;
+    if (window.GRM || window.GRM_LOG) {
+        return grmlog('global Reaction Monitor变量GRM/GRM_LOG已经存在！');
+    }
+    window.GRM_LOG = [];
+    window.GRM = {
+        _$: _$,
+        CONFIG: {
+            /**
+             * 1.axios
+             * -error信息都在error.response里
+             * -正常返回信息在res里，
+             * -返回值是res.data
+             * -相关的信息在res.config(.url/.params/.data，其中data和param之间关系很奇怪，有时候data会包含对应的应该在params的东西)
+             * -
+             * 2.$.ajax
+             */
+            isInit: false,
+            missionPool: [],
+            apiModule: 'none-api-module',
+            gsmUrl: 'https://staticiot.cdn.bcebos.com/union/stable-js-iife-1.0.3.js',
+            gsmObject: null,
+            uk: '',
+            group: '',
+            page: '',
+            apiCheckerMap:[],
+            domCheckerMap:[],
+            schemaCheckerMap:[]
+        },
+        // 所需通用字段
+        EXPECT: {
+            DANGER: 2,
+            NOTICE: 1,
+            SAFE: 0,
+            IGNORE: -1
+        },
+        // public
+        init: function (config) {
+            var self = this;
+            try{
+                /**
+                 * 暂时就只能改一下api类型，其他都从checkermap中去指定
+                 */
+                if(!this.navigatorFitSpy()){
+                    
+                    return grmlog('浏览器版本不支持该功能');
+                }
+    
+                if (config.apiModule && is('String', config.apiModule)) {
+                    this.CONFIG.apiModule = config.apiModule;
+                }
+                else {
+                    return grmlog('should set api module（axios/$.ajax） as [apiModule] in config!')
+                }
+    
+                // 注册api检测进程序
+                if (is('Object', config.apiCheckerMap)) {
+                    this.CONFIG.apiCheckerMap = config.apiCheckerMap;
+                }
+    
+                // 注册dom检测进程序
+                if (is('Object', config.domCheckerMap)) {
+                    this.CONFIG.domCheckerMap = config.domCheckerMap;
+                }
+    
+                // 增加一个schema回调检验检测进程序
+                if (is('Object', config.schemaCheckerMap)) {
+                    this.CONFIG.schemaCheckerMap = config.schemaCheckerMap;
+                }
+    
+                if (config.group && is('String', config.group)) {
+                    this.CONFIG.group = config.group;
+                }
+                else {
+                    return grmlog('should set groupName as [group] in config!');
+                }
+    
+                if (config.page && is('String', config.page)) {
+                    this.CONFIG.page = config.page;
+                }
+    
+                if (isNot('Undefined', config.uk)) {
+                    this.CONFIG.uk = config.uk;
+                }
+    
+                this.loadGSMScriptAndInitial(function () {
+                    self.finishInit();
+                    config.callback && config.callback.call(self, self);
+                });
+            }
+            catch(err){
+                grmlog(err);
+            }
+        },
+        finishInit: function () {
+            var self = this;
+            this.CONFIG.isInit = true;
+            // 清理一下init完成之前的任务
+            var initInterval = setInterval(function () {
+                // 若此时有任务，就执行该任务，没有即可展暂停
+                if (self.CONFIG.missionPool.length > 0) {
+                    self[self.CONFIG.missionPool[0].type](self.CONFIG.missionPool[0].mission);
+                    self.CONFIG.missionPool.shift(0);
+                }
+                else {
+                    clearInterval(initInterval);
+                }
+            }, 100);
+        },
+        // public
+        // 对外暴露的策略的校验api
+        apiMonitor: function (reaction) {
+            try {
+                // 假设未定义相关接口direction，那么就直接过去了
+                // 这里用到了接口返回值来确定到底执行所定义的map哪一个指令
+                var apiDirection = this.getApiDirection(reaction);
+                if(!apiDirection.key){
+                    return false;
+                }
+
+                // 通用的api接口返回值预期检测，比如空，服务器异常等等
+                // 那么在commonchecker中，存在没有key的情况是不需要继续执行任何指令的，所以可以给一个ignore
+                var commonResult = this.commonApiChecker(reaction, apiDirection.key);
+                // 如果可以通过通用检查，那就进入接口的定制检测
+                if (apiDirection.key && this.safe(commonResult)) {
+                    var keyInfo = this.formmatApiKeyInfo(reaction);
+                    function handleDanger(msg){
+                        var directionReportResult = {
+                            page: this.CONFIG.apiCheckerMap[apiDirection.key].dim.page || this.CONFIG.page,
+                            factor: this.CONFIG.apiCheckerMap[apiDirection.key].dim.factor,
+                            msg: msg
+                        };
+
+                        if(
+                            this.CONFIG.apiCheckerMap[apiDirection.key].group !== this.CONFIG.group
+                        ){
+                            directionReportResult.group = this.CONFIG.apiCheckerMap[apiDirection.key].group;
+                        }
+        
+                        if(isNot('String',directionReportResult.page)){
+                            return grmlog('schemaCheckerMap.page should be a String');
+                        }
+        
+                        if(isNot('String',directionReportResult.factor)){
+                            return grmlog('schemaCheckerMap.factor should be a String');
+                        }
+        
+                        if(isNot('String',directionReportResult.msg)){
+                            return grmlog('result.msg should be a String');
+                        }
+                        
+                        this.gsmReport({
+                            key: 'sendExceptToSpy',
+                            info: directionReportResult
+                        });
+                    }
+
+                    try {
+                        this.CONFIG.apiCheckerMap[apiDirection.key].handler(
+                            keyInfo,
+                            handleDanger.bind(this),
+                            reaction
+                        );
+                    }
+                    catch (err) {
+                        grmlog(err);
+                    }
+                } 
+            }
+            catch(err){
+                grmlog(err);
+            }
+        },
+        // public
+        domMonitor: function (key) {
+            try {
+
+                var direction, directionResult;
+                if (!this.CONFIG.domCheckerMap[key]) {
+                    return grmlog('dom monitor key 【' + key + '】 uninitialized!');
+                }
+                try {
+                    direction = _$(this.CONFIG.domCheckerMap[key].selector);
+                    directionResult = !direction.length;
+                }
+                catch (err) {
+                    directionResult = {
+                        expect: this.EXPECT.SAFE
+                    };
+                    grmlog('dom monitor handler error, considered as safe');
+                }
+                if (directionResult) {
+                    var directionReportResult = {
+                        page: this.CONFIG.domCheckerMap[key].dim.page || this.CONFIG.page,
+                        factor: this.CONFIG.domCheckerMap[key].dim.factor,
+                        msg: this.CONFIG.domCheckerMap[key].msg
+                    };
+    
+                    if(
+                        this.CONFIG.domCheckerMap[key].group
+                        && this.CONFIG.domCheckerMap[key].group !== this.CONFIG.group
+                    ){
+                        directionReportResult.group = this.CONFIG.domCheckerMap[key].group;
+                    }
+    
+                    if(isNot('String',directionReportResult.page)){
+                        return grmlog('schemaCheckerMap.page should be a String');
+                    }
+    
+                    if(isNot('String',directionReportResult.factor)){
+                        return grmlog('schemaCheckerMap.factor should be a String');
+                    }
+    
+                    if(isNot('String',directionReportResult.msg)){
+                        return grmlog('result.msg should be a String');
+                    }
+    
+                    this.gsmReport({
+                        key: 'sendExceptToSpy',
+                        info: directionReportResult
+                    });
+                }
+                return direction;
+            }
+            catch(err){
+                grmlog(err);
+            }
+        },
+        perfMonitor: function (config) {
+            try {
+                var directionReportResult = {
+                    // 支持默认，优先config，方便不同组的性能上报覆盖
+                    page: config.page || this.CONFIG.page,
+                    firstScreen: config.firstScreen,
+                    whiteScreen: config.whiteScreen,
+                    dim: config.dim
+                };
+    
+                if( 
+                    (config.group && is('String', config.group))
+                    && config.group !== this.CONFIG.group
+                ){
+                    directionReportResult.group = config.group;
+                }
+    
+                // perf无需注册，只需要拿到page扔进去就行
+                if(isNot('Number', config.firstScreen)){
+                    return grmlog('config.firstScreen need to be a number!');
+                }
+                if(isNot('Number', config.whiteScreen)){
+                    return grmlog('config.whiteScreen need to be a number!');
+                }
+    
+                this.gsmReport({
+                    key: 'sendPerfToSpy',
+                    info: directionReportResult
+                });
+            }
+            catch(err){
+                grmlog(err);
+            }
+        },
+        schemaMonitor: function (key, reaction) {
+            var directionResult;
+            try {
+
+                if (!this.CONFIG.schemaCheckerMap[key]) {
+                    return grmlog('schema monitor key 【' + key + '】 uninitialized!');
+                }
+    
+                function handleDanger(msg){
+                    var directionReportResult = {
+                        group: this.CONFIG.schemaCheckerMap[key].group || this.CONFIG.group,
+                        page: this.CONFIG.schemaCheckerMap[key].dim.page || this.CONFIG.page,
+                        factor: this.CONFIG.schemaCheckerMap[key].dim.factor,
+                        // 这里是获取的结果
+                        msg: msg
+                    };
+                    
+                    if(this.CONFIG.schemaCheckerMap[key].group !== this.CONFIG.group){
+                        directionReportResult.group = this.CONFIG.schemaCheckerMap[key].group;
+                    }
+    
+                    if(isNot('String',directionReportResult.page)){
+                        return grmlog('schemaCheckerMap.page should be a String');
+                    }
+    
+                    if(isNot('String',directionReportResult.factor)){
+                        return grmlog('schemaCheckerMap.factor should be a String');
+                    }
+    
+                    if(isNot('String',directionReportResult.msg)){
+                        return grmlog('result.msg should be a String');
+                    }
+    
+                    this.gsmReport({
+                        key: 'sendExceptToSpy',
+                        info: directionReportResult
+                    });
+                }
+    
+                try {
+                    directionResult = this.CONFIG.schemaCheckerMap[key].handler(
+                        reaction,
+                        handleDanger.bind(this)
+                    );
+                }
+                catch (err) {
+                    grmlog('dom monitor handler error, considered as safe');
+                }
+            }
+            catch (err){
+                grmlog(err);
+            }
+        },
+        /**
+         * 整个逻辑就是根据reaction有效信息，确定result.expect，通过result对象走通完整流程，确定是否稳定
+         */
+        getApiDirection: function (reaction) {
+            // reaction有效信息和reactionMap的对照，用来确定有什么接口内容级别的问题
+            var apiInfo = this.formmatApiKeyInfo(reaction);
+            for (var key in this.CONFIG.apiCheckerMap) {
+                if(
+                    isNot('Array', this.CONFIG.apiCheckerMap[key].router)
+                    && isNot('Array', this.CONFIG.apiCheckerMap[key].bingo)
+                ){
+                    return grmlog('please inject at least one of [router/bingo] in apiCheckerMap of key:' + key + 'as Array!');
+                }
+
+                var unMatchRouterNum = 0;
+                if(is('Array', this.CONFIG.apiCheckerMap[key].router)){
+                    unMatchRouterNum = this.CONFIG.apiCheckerMap[key].router.length;
+                    for (var i = 0; i < this.CONFIG.apiCheckerMap[key].router.length; i++) {
+                        if (
+                            apiInfo.href
+                            && apiInfo.href.match(this.CONFIG.apiCheckerMap[key].router[i])
+                        ) {
+                            unMatchRouterNum--;
+                        }
+                    }
+                }
+
+                var unMatchBingoNum = 0;
+                if(is('Array', this.CONFIG.apiCheckerMap[key].bingo)){
+                    unMatchBingoNum = this.CONFIG.apiCheckerMap[key].bingo.length;
+                    // 这个的意思就是bingo中匹配的正则全中了，即这个api约束完全匹配上了
+                    for (var k = 0; k < this.CONFIG.apiCheckerMap[key].bingo.length; k++) {
+                        if (
+                            apiInfo.finalUrl
+                            && apiInfo.finalUrl.match(this.CONFIG.apiCheckerMap[key].bingo[k])
+                        ) {
+                            unMatchBingoNum--;
+                        }
+                    }
+                }
+
+                // 如果发现了路由+特征完全匹配的，就return这个key出去
+                if (unMatchRouterNum === 0 && unMatchBingoNum === 0) {
+                    return {
+                        key: key,
+                        apiInfo: apiInfo
+                    };
+                }
+            }
+            return {};
+        },
+        // 通过对reaction的抹平，得到关键信息用来判断到底走哪个direction
+        formmatApiKeyInfo: function (reaction) {
+            var apiInfo = {
+                finalUrl: '',
+                data: null,
+                href: '',
+                status: undefined
+            };
+            // axios关键信息都在config里，直接给config就行
+            if (this.CONFIG.apiModule === 'axios') {
+                // 这里有个问题，data和params这俩都需要考虑
+                apiInfo.finalUrl = reaction.config.url + '?';
+                for (var key in reaction.config.params) {
+                    apiInfo.finalUrl += key + '=' + reaction.config.params[key] + '&';
+                }
+                apiInfo.finalUrl += reaction.config.data;
+                // 万一后边有一个&就去掉，将post内容和参数拼接成一个完整的请求
+                apiInfo.finalUrl.replace(/&$/, '');
+                // 返回值数据
+                apiInfo.data = reaction.data;
+                apiInfo.status = reaction.status;
+            }
+            else if (this.CONFIG.apiModule === '$.ajax') {
+                // option中似乎已经处理好了想要的url
+                apiInfo.finalUrl = reaction.option.url;
+                try {
+                    apiInfo.data = this.parseJSON(reaction.xhr.responseText);
+                }
+                catch (err) {
+                    // 假设不是正经JSON，那就直接报个空对象吧，就不符合预期了
+                    apiInfo.data = {};
+                }
+                apiInfo.status = reaction.xhr.status;
+            }
+            else if(this.CONFIG.apiModule === 'Zepto.ajax'){
+                // option中似乎已经处理好了想要的url
+                apiInfo.finalUrl = reaction.xhr.responseURL;
+                try {
+                    apiInfo.data = this.parseJSON(reaction.xhr.responseText);
+                }
+                catch (err) {
+                    // 假设不是正经JSON，那就直接报个空对象吧，就不符合预期了
+                    apiInfo.data = {};
+                }
+                apiInfo.status = reaction.xhr.status;
+            }
+            // 最后即便是相同接口，仍有可能会根据路由匹配
+            apiInfo.href = location.href;
+            return apiInfo;
+        },
+        /**
+         * 通用的接口返回异常处理，通过才会走api逻辑判断
+         * 1.接口进入了错误回调，则直接走common拦截住
+         * 2.如果接口返回值外层格式符合预期，才进入返回值的判断逻辑
+         */
+        commonApiChecker: function (reaction, key) {
+            // 公共检查就是：即便没有对应的key，也得看看这个请求是不是异常的，从而确定是否要上报给分组的默认检查组，比如服务器挂了，根本什么都不返回
+            // 这里如果接口返回值是空，其实也没有key，
+            var result = {
+                // 啥都没命中情况下默认是正常
+                expect: this.EXPECT.SAFE,
+                group: key && this.CONFIG.apiCheckerMap[key].dim.group || this.CONFIG.group,
+                // 获取命中api的基本信息
+                page: key && this.CONFIG.apiCheckerMap[key].dim.page || this.CONFIG.page,
+                factor: key && this.CONFIG.apiCheckerMap[key].dim.factor,
+                msg: ''
+            };
+
+            if (this.CONFIG.apiModule === 'axios') {
+
+                // 假设啥都没返回，从axios来看，这是出问题了
+                if (!reaction) {
+                    result.expect = this.EXPECT.DANGER;
+                    // 由于不存在任何所属，匹配是匹配不到的
+                    result.page = this.CONFIG.page;
+                    result.factor = '服务器无反馈';
+                    result.msg = '数据异常-服务无返回值';
+                }
+                // 假设有返回500+代表服务器处理遇到了问题，但是此时是有返回值的
+                else if (reaction.status >= 500) {
+                    result.expect = this.EXPECT.DANGER;
+                    result.msg = '状态码[' + reaction.status + ']-服务内部错误';
+                }
+                // 又有返回值
+                else {
+                    result.expect = this.EXPECT.IGNORE;
+                }
+            }
+            else if (this.CONFIG.apiModule === '$.ajax') {
+
+                // 没返回值显然是有问题的
+                if (!reaction.xhr.responseText) {
+                    // 这里代表服务器什么都没给返回
+                    result.expect = this.EXPECT.DANGER;
+                    // 由于不存在任何所属，匹配是匹配不到的
+                    result.page = this.CONFIG.page;
+                    result.factor = '服务器无反馈';
+                    result.msg = '数据异常-服务无返回值';
+                }
+                // ajax同理，有返回值和返回http状态
+                else if (reaction.xhr.status >= 500) {
+                    result.expect = this.EXPECT.DANGER;
+                    result.msg = '状态码[' + reaction.xhr.status + ']-服务内部错误';
+                }
+                else {
+                    result.expect = this.EXPECT.IGNORE;
+                }
+            }
+            if (this.notSafe(result.expect)) {
+                this.gsmReport({ key: 'sendExceptToSpy', info: result });
+            }
+            return result.expect;
+        },
+        loadGSMScriptAndInitial: function (callback) {
+            var self = this;
+            var head = document.getElementsByTagName('head')[0];
+            var script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.charset = 'UTF-8';
+            script.onload = script.onreadystatechange = function () {
+                if (!this.readyState || this.readyState === 'loaded' || this.readyState === 'complete') {
+                    // 【待完善-iife】由于仅支持iife方式，所以这么赋值没啥问题
+                    self.CONFIG.gsmObject = window.GSM;
+                    // 此时标签已经加载进来，代表SpyClient对象已经成功挂载，进入spyclient初始化为spy实例阶段
+                    self.CONFIG.gsmObject.init({
+                        group: self.CONFIG.group,
+                        page: self.CONFIG.page,
+                        uk: self.CONFIG.uk || 'ukIsNotGetYet',
+                        callback: function () {
+                            self.CONFIG.isInit = true;
+                            callback && callback.call(self, self);
+                        }
+                    });
+                    // 避免老ie内存泄露
+                    script.onload = script.onreadystatechange = null;
+                }
+            };
+            script.src = this.CONFIG.gsmUrl;
+            head.appendChild(script);
+        },
+        gsmReport: function (config) {
+            if (this.CONFIG.isInit) {
+                this.CONFIG.gsmObject[config.key](config.info);
+            }
+            else {
+                this.CONFIG.missionPool.push({
+                    type: 'gsmReport',
+                    mission: config
+                });
+            }
+        },
+        getGsmInstance: function () {
+            try {
+                if (this.CONFIG.gsmObject) {
+                    return this.CONFIG.gsmObject;
+                }
+                grmlog('尚未初始化完成gsm');
+            }
+            catch(err){
+                grmlog(err);
+            }
+        },
+        updateGsmInfo: function (config) {
+            try {
+                if (!config.key || !config.value) {
+                    return grmlog('you should pass \'key\' and \'value\' for key to this function!');
+                }
+    
+                if(config.key !== 'page' && config.key !== 'uk'){
+                    return grmlog('never update key except [page] and [uk]');                
+                }
+    
+                var self = this;
+                var updateInfo = {};
+                updateInfo[config.key] = config.value;
+                // 为了避免还没初始化好grm，导致无法正常的更新uk
+                if (this.CONFIG.isInit) {
+                    // 同时更新内部和外部保证一致
+                    this.CONFIG.gsmObject.setCommonStableInfo(updateInfo);
+                    this.CONFIG[config.key] = config.value;
+                }
+                else {
+                    this.CONFIG.missionPool.push({
+                        type: 'updateGsmInfo',
+                        mission: config
+                    });
+                }
+            }
+            catch(err){
+                grmlog(err);
+            }
+        },
+        // 目前判定danger才上报，ignore作为错误但是不收集处理
+        safe: function (expect) {
+            // 出现不可预期的返回值可以认为是通过的，因为GRM系统并未成功捕获其状态，贸然fail会导致上报不符合预期
+            if(is('Undefined', expect)){
+                return true;
+            }
+            return expect <= 1;
+        },
+        notSafe: function (expect) {
+            // 出现不可预期的返回值可以认为是通过的，因为GRM系统并未成功捕获其状态，贸然fail会导致上报不符合预期
+            if(is('Undefined', expect)){
+                return false;
+            }
+            return expect > 1;
+        },
+        // fork自老jquerypacket，原因是低版本ie不支持JSON.parse方法
+        parseJSON: function (data) {
+            var rvalidchars = /^[\],:{}\s]*$/,
+                rvalidescape = /\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g,
+                rvalidtokens = /"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,
+                rvalidbraces = /(?:^|:|,)(?:\s*\[)+/g;
+
+            if (typeof data === 'object') {
+                return data;
+            }
+
+            if (typeof data !== 'string' || !data) {
+                return null;
+            }
+
+            // Make sure leading/trailing whitespace is removed (IE can't handle it)
+            data = this.trim(data);
+
+            // Make sure the incoming data is actual JSON
+            // Logic borrowed from http://json.org/json2.js
+            if (rvalidchars.test(data.replace(rvalidescape, '@')
+                .replace(rvalidtokens, ']')
+                .replace(rvalidbraces, ''))) {
+                // Try to use the native JSON parser first
+                return window.JSON && window.JSON.parse
+                    ? window.JSON.parse(data)
+                    : (new Function('return ' + data))();
+            }
+            return grmlog('invalid JSON');
+        },
+        trim: function (text) {
+            var trim = String.prototype.trim;
+            var trimLeft = /^\s+/;
+            var trimRight = /\s+$/;
+            var rnotwhite = /\S/;
+
+            // IE doesn't match non-breaking spaces with \s
+            if (rnotwhite.test('\xA0')) {
+                trimLeft = /^[\s\xA0]+/;
+                trimRight = /[\s\xA0]+$/;
+            }
+
+            if (trim) {
+                return text == null
+                    ? ''
+                    : trim.call(text);
+            }
+
+            return text == null
+                ? ''
+                : text.toString().replace(trimLeft, '').replace(trimRight, '');
+        },
+        navigatorFitSpy: function () {
+            // 判断浏览器是否是spy支持的版本
+            if (
+                navigator.appName === 'Microsoft Internet Explorer'
+            && parseInt(navigator.appVersion.split(';')[1].replace(/[ ]/g, '').replace('MSIE', '')) < 9
+            ) {
+                return false;
+            }
+            return true;
+        }
+    };
+}());
