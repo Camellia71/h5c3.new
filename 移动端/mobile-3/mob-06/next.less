@@ -1,0 +1,23 @@
+.header {
+    width: 200px;
+    height: 200px;
+    background-color: pink;
+    // less 嵌套 直接写到父元素里
+    a {
+        background-color: red;
+        // 伪类选择器 交集选择器 伪元素选择器 我们内层选择器前面需要加&
+        &:hover {
+            color: blue;
+        }
+    }
+}
+
+.nav {
+    .logo {
+        color: green;
+
+        &::before {
+            content: '1';
+        }
+    }
+}

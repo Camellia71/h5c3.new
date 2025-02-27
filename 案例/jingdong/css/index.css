@@ -7,7 +7,11 @@ body {
     font-family: -apple-system, Helvetica, sans-serif;
     color: #666;
     line-height: 1.5;
-    background-color: #ccc;
+}
+
+a {
+    color: #666;
+    text-decoration: none;
 }
 
 ul {
@@ -15,8 +19,26 @@ ul {
     padding: 0;
     list-style: none;
 }
+
 img {
     vertical-align: top;
+}
+
+div {
+    box-sizing: border-box;
+}
+
+.clearfix:after {
+    content: "";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+
+.clearfix {
+    /* IE6、7专有 */
+    *zoom: 1;
 }
 
 .app {
@@ -39,6 +61,7 @@ img {
 
 .app ul li:nth-child(1) img {
     width: 10px;
+    vertical-align: middle;
 }
 
 .app ul li:nth-child(2) {
@@ -120,21 +143,57 @@ img {
 .silder img {
     width: 100%;
 }
+
 /* 品牌日 */
 
 .brand {
     overflow: hidden;
     border-radius: 10px 10px 0 0;
 }
+
 .brand div {
     float: left;
     width: 33.33%;
 }
+
 .brand div img {
     width: 100%;
 }
-.nav a {
+
+nav a {
     float: left;
     width: 20%;
-    
+    text-align: center;
+}
+
+nav a img {
+    width: 40px;
+    margin: 10px 0;
+}
+
+nav a span {
+    display: block;
+}
+
+.news {
+    margin-top: 20px;
+}
+
+.news a {
+    box-sizing: border-box;
+}
+
+.news a:nth-child(1) {
+    float: left;
+    width: 50%;
+    height: 160px;
+    border: 5px solid pink;
+}
+
+
+.news a:nth-child(n+2) {
+    float: left;
+    width: 25%;
+    height: 160px;
+    border: 5px solid purple;
 }
