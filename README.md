@@ -1,0 +1,529 @@
+## 1.HTML5新特性
+
+HTML5的新增特性主要是针对于以前的不足，增加了一些新的标签、新的表单和新的表单属性等。这些新特性都有兼容性问题，基本是IE9+ 以上版本的浏览器才支持，如果不考虑兼容性问题，可以大量使用这些新特性。
+
+#### 1.1HTML5 新增的语义化标签
+
+<header>：头部标签                                       
+
+<nav>：导航标签
+
+<article>：内容标签
+
+<section>：定义文档某个区域
+
+<aside>：侧边栏标签
+
+<footer>：尾部标签
+
+![image-20250211102703597](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20250211102703597.png)
+
+注意：
+
+这种语义化标准主要是针对搜索引擎的
+
+这些新标签页面中可以使用多次
+
+在IE9 中，需要把这些元素转换为块级元素
+
+其实，我们移动端更喜欢使用这些标签
+
+#### 1.2HTML5 新增的多媒体标签
+
+新增的多媒体标签主要包含两个，使用它们可以很方便的在页面中嵌入音频和视频，而不再去使用flash和其他浏览器插件。
+
+##### 1.2.1视频：video
+
+当前<video> 元素支持三种视频格式：尽量使用mp4格式
+
+![image-20250211162056300](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20250211162056300.png)
+
+```html
+<video src="文件地址" controls="controls"></video>
+```
+
+```html
+<video controls="controls" width="300">
+    <source src="move.ogg"type="video/ogg" >
+    <source src="move.mp4"type="video/mp4" >
+    您的浏览器暂不支持<video>标签播放视频
+</ video >
+```
+
+HTML5在不使用插件的情况下，也可以原生的支持音频格式文件的播放，当然，支持的格式是有限的。
+
+![image-20250211162307391](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20250211162307391.png)
+
+##### 1.2.2音频：audio
+
+当前<audio> 元素支持三种音频格式：
+
+![image-20250211162405709](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20250211162405709.png)
+
+```html
+<audio src="文件地址" controls="controls"></audio>
+```
+
+```html
+< audio controls="controls">
+    <source src="happy.mp3" type="audio/mpeg" >
+    <source src="happy.ogg" type="audio/ogg" >
+    您的浏览器暂不支持<audio>标签。
+</ audio>
+```
+
+谷歌浏览器把音频和视频自动播放禁止了
+
+![](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20250211162625076.png)
+
+##### 1.2.3多媒体标签总结
+
+音频标签和视频标签使用方式基本一致
+
+浏览器支持情况不同
+
+谷歌浏览器把音频和视频自动播放禁止了
+
+我们可以给视频标签添加muted 属性来静音播放视频，音频不可以（可以通过JavaScript解决）
+
+视频标签是重点，我们经常设置自动播放，不使用controls 控件，循环和设置大小属性
+
+#### 1.3HTML5 新增的input 类型
+
+![image-20250211163418612](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20250211163418612.png)
+
+**重点**记住： number，tel，search 这三个
+
+#### 1.4HTML5 新增的表单属性
+
+![image-20250211163526073](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20250211163526073.png)
+
+multiple加上后，选择时按住ctrl可以多选
+
+```html
+可以通过以下设置方式修改placeholder里面的字体颜色：
+input::placeholder {
+	color:pink;
+}
+```
+
+## 2.css3新特性
+
+#### 2.1 CSS3 的现状
+
+--新增的CSS3特性有兼容性问题，ie9+才支持
+
+--移动端支持优于PC 端
+
+--不断改进中
+
+--应用相对广泛
+
+--现阶段主要学习：新增选择器和盒子模型以及其他特性
+
+**CSS3** **新增选择器**
+
+1.属性选择器
+
+2.结构伪类选择器
+
+3.伪元素选择器
+
+#### 2.2 属性选择器
+
+属性选择器可以根据元素特定属性的来选择元素。这样就可以不用借助于类或者id选择器。
+
+![image-20250211202239925](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20250211202239925.png)
+
+**注意**：类选择器、属性选择器、伪类选择器，权重为10。
+
+#### 2.3 结构伪类选择器
+
+结构伪类选择器主要根据文档结构来选择器元素，常用于根据父级选择器里面的子元素
+
+![image-20250211202325297](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20250211202325297.png)
+
+nth-child（n）选择某个父元素的一个或多个特定的子元素（重点）
+
+n 可以是数字，关键字和公式
+
+n 如果是数字，就是选择第n 个子元素，里面数字从1开始…
+
+n 可以是关键字：even 偶数，odd 奇数
+
+n 可以是公式：常见的公式如下( 如果n是公式，则从0开始计算，但是第0 个元素或者超出了元素的个数会被忽略)
+
+![image-20250211202411277](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20250211202411277.png)
+
+结构伪类选择器主要根据文档结构来选择器元素，常用于根据父级选择器里面的子元素
+
+![image-20250211202438539](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20250211202438539.png)
+
+**区别**：
+
+1.nth-child 对父元素里面所有孩子排序选择（序号是固定的） 先找到第n个孩子，然后看看是否和E匹配
+
+2.nth-of-type 对父元素里面指定子元素进行排序选择。先去匹配E ，然后再根据E 找第n个孩子
+
+**小结**
+
+结构伪类选择器一般用于选择父级里面的第几个孩子
+
+nth-child 对父元素里面所有孩子排序选择（序号是固定的） 先找到第n个孩子，然后看看是否和E匹配
+
+nth-of-type 对父元素里面指定子元素进行排序选择。先去匹配E ，然后再根据E 找第n个孩子
+
+关于nth-child（n）我们要知道n 是从0 开始计算的，要记住常用的公式
+
+如果是无序列表，我们肯定用nth-child 更多
+
+类选择器、属性选择器、伪类选择器，权重为10。
+
+#### 2.4 伪元素选择器（重点）
+
+伪元素选择器可以帮助我们利用CSS创建新标签元素，而不需要HTML标签，从而简化HTML结构。
+
+![image-20250211202604547](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20250211202604547.png)
+
+**注意**：
+
+before和after创建一个元素，但是属于行内元素
+
+新创建的这个元素在文档树中是找不到的，所以我们称为伪元素
+
+语法： element::before { }
+
+before和after必须有content 属性
+
+before 在父元素内容的前面创建元素，after 在父元素内容的后面插入元素
+
+伪元素选择器和标签选择器一样，权重为1
+
+#### 2.5 css3 2D转换
+
+转换（transform）是CSS3中具有颠覆性的特征之一，可以实现元素的位移、旋转、缩放等效果；转换（transform）你可以简单理解为变形。
+
+移动：translate
+
+旋转：rotate
+
+缩放：scale
+
+##### 2.5.1 二维坐标系
+
+2D转换是改变标签在二维平面上的位置和形状的一种技术
+
+![image-20250220152841211](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20250220152841211.png)
+
+##### 2.5.2 2D 转换之移动 translate
+
+2D移动是2D转换里面的一种功能，可以改变元素在页面中的位置，类似定位。
+
+```html
+transform: translate(x,y);
+或者分开写
+transform: translateX(n);
+transform: translateY(n);
+```
+
+定义2D 转换中的移动，沿着X 和Y 轴移动元素
+
+translate最大的优点：不会影响到其他元素的位置
+
+translate中的百分比单位是相对于自身元素的translate:(50%,50%);
+
+对行内标签没有效果
+
+##### 2.5.3 2D 转换之旋转rotate
+
+2D旋转指的是让元素在2维平面内顺时针旋转或者逆时针旋转。
+
+```html
+transform:rotate(度数)
+```
+
+rotate里面跟度数，单位是deg比如rotate(45deg)
+
+角度为正时，顺时针，负时，为逆时针
+
+默认旋转的中心点是元素的中心点
+
+##### 2.5.4 2D 转换中心点transform-origin
+
+我们可以设置元素转换的中心点
+
+```html
+transform-origin: x y;
+```
+
+注意后面的参数x 和y 用空格隔开
+
+x y 默认转换的中心点是元素的中心点(50%50%)
+
+还可以给x y 设置像素或者方位名词（topbottom leftrightcenter）
+
+##### 2.5.5 2D 转换之缩放scale
+
+缩放，顾名思义，可以放大和缩小。只要给元素添加上了这个属性就能控制它放大还是缩小。
+
+```html
+transform:scale(x,y);
+```
+
+注意
+
+注意其中的x和y用逗号分隔
+
+transform:scale(1,1) ：宽和高都放大一倍，相对于没有放大
+
+transform:scale(2,2) ：宽和高都放大了2倍
+
+transform:scale(2) ：只写一个参数，第二个参数则和第一个参数一样，相当于scale(2,2)
+
+transform:scale(0.5,0.5)：缩小
+
+sacle缩放最大的优势：可以设置转换中心点缩放，默认以中心点缩放的，而且不影响其他盒子
+
+##### 2.5.6 2D 转换综合写法
+
+1. 同时使用多个转换，其格式为：transform: translate() rotate() scale() ...等，
+2. 其顺序会影转换的效果。（先旋转会改变坐标轴方向）
+3. 当我们同时有位移和其他属性的时候，记得要将位移放到最前
+
+##### 2.5.7 2D 转换总结
+
+转换transform 我们简单理解就是变形有2D 和3D 之分
+
+我们暂且学了三个分别是位移旋转和缩放
+
+2D 移动translate(x, y)最大的优势是不影响其他盒子，里面参数用%，是相对于自身宽度和高度来计算的
+
+可以分开写比如translateX(x)和translateY(y)
+
+2D 旋转rotate(度数)可以实现旋转元素度数的单位是deg
+
+2D 缩放sacle(x,y)里面参数是数字不跟单位可以是小数最大的优势不影响其他盒子
+
+设置转换中心点transform-origin : x y;参数可以百分比、像素或者是方位名词
+
+当我们进行综合写法，同时有位移和其他属性的时候，记得要将位移放到最前
+
+#### 2.6 css3动画
+
+动画（animation）是CSS3中具有颠覆性的特征之一，可通过设置多个节点来精确控制一个或一组动画，常用来实现复杂的动画效果。相比较过渡，动画可以实现更多变化，更多控制，连续自动播放等效果。
+
+##### 2.6.1 动画的基本使用
+
+制作动画分为两步：1.先定义动画   2.再使用（调用）动画
+
+###### 1.用keyframes 定义动画（类似定义类选择器）
+
+```html
+@keyframes 动画名称 {
+        0%{
+            width:100px;
+        }
+        100%{
+            width:200px;
+        }
+	}	
+```
+
+动画序列
+
+0% 是动画的开始，100% 是动画的完成。这样的规则就是动画序列。
+
+在@keyframes中规定某项CSS 样式，就能创建由当前样式逐渐改为新样式的动画效果。
+
+动画是使元素从一种样式逐渐变化为另一种样式的效果。您可以改变任意多的样式任意多的次数。
+
+请用百分比来规定变化发生的时间，或用关键词"from" 和"to"，等同于0%和100%。
+
+![image-20250221011441646](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20250221011441646.png)
+
+###### 2.元素使用动画
+
+```html
+div {
+        width: 200px;
+        height: 200px;
+        background-color: aqua;
+        margin: 100px auto;
+        /*调用动画*/
+        animation-name:动画名称;
+        /*持续时间*/
+        animation-duration:持续时间;
+}
+```
+
+##### 2.6.2 动画常用属性
+
+![image-20250221011603013](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20250221011603013.png)
+
+##### 2.6.3 动画简写属性
+
+animation：动画名称持续时间运动曲线何时开始播放次数是否反方向动画起始或者结束的状态;
+
+```html
+animation：动画名称 持续时间 运动曲线 何时开始 播放次数 是否反方向 动画起始或者结束的状态;
+```
+
+简写属性里面不包含animation-play-state
+
+暂停动画：animation-play-state:puased; 经常和鼠标经过等其他配合使用
+
+想要动画走回来，而不是直接跳回来：animation-direction：alternate
+
+盒子动画结束后，停在结束位置：animation-fill-mode：forwards
+
+##### 2.6.4 速度曲线细节
+
+animation-timing-function：规定动画的速度曲线，默认是“ease”
+
+![image-20250221011754116](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20250221011754116.png)
+
+#### 2.7 3D转换
+
+近大远小。
+
+物体后面遮挡不可见
+
+##### 2.7.1 三维坐标系
+
+x轴：水平向右注意：x 右边是正值，左边是负值
+
+y轴：垂直向下注意：y 下面是正值，上面是负值
+
+z轴：垂直屏幕注意：往外面是正值，往里面是负值
+
+![image-20250223221844928](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20250223221844928.png)
+
+3D位移: translate3d(x,y,z)
+
+3D旋转: rotate3d(x,y,z)
+
+透视: perspective
+
+3D呈现transfrom-style
+
+##### 2.7.2 3D移动translate3d
+
+3D移动在2D移动的基础上多加了一个可以移动的方向，就是z轴方向。
+
+translform:translateX(100px)：仅仅是在x轴上移动
+
+translform:translateY(100px)：仅仅是在Y轴上移动
+
+translform:translateZ(100px)：仅仅是在Z轴上移动（注意：translateZ一般用px单位）
+
+transform:translate3d(x,y,z)：其中x、y、z 分别指要移动的轴的方向的距离
+
+因为z轴是垂直屏幕，由里指向外面，所以默认是看不到元素在z轴的方向上移动
+
+##### 2.7.3 透视perspective
+
+在2D平面产生近大远小视觉立体，但是只是效果二维的
+
+如果想要在网页产生3D效果需要透视（理解成3D物体投影在2D平面内）。
+
+模拟人类的视觉位置，可认为安排一只眼睛去看
+
+透视我们也称为视距：视距就是人的眼睛到屏幕的距离
+
+距离视觉点越近的在电脑平面成像越大，越远成像越小
+
+透视的单位是像素
+
+<img src="C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20250223222228017.png" alt="image-20250223222228017" style="zoom:50%;" />
+
+透视写在被观察元素的父盒子上面的
+
+d：就是视距，视距就是一个距离人的眼睛到屏幕的距离。
+
+z：就是z轴，物体距离屏幕的距离，z轴越大（正值）我们看到的物体就越大。
+
+<img src="C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20250223222247171.png" alt="image-20250223222247171" style="zoom:50%;" />
+
+##### 2.7.4 translateZ
+
+```
+translform : translateZ(100px)
+```
+
+仅仅是在Z轴上移动。
+
+translateZ：近大远小
+
+translateZ：往外是正值
+
+translateZ：往里是负值
+
+##### 2.7.5 3D旋转rotate3d
+
+3D旋转指可以让元素在三维平面内沿着x轴，y轴，z轴或者自定义轴进行旋转。
+
+语法
+
+transform:rotateX(45deg)：沿着x轴正方向旋转45度
+
+transform:rotateY(45deg) ：沿着y轴正方向旋转45deg
+
+transform:rotateZ(45deg) ：沿着Z轴正方向旋转45deg
+
+transform:rotate3d(x,y,z,deg)：沿着自定义轴旋转deg为角度（了解即可）
+
+​	xyz是表示旋转轴的矢量，是标示你是否希望沿着该轴旋转，最后一个标示旋转的角度。
+
+​	transform:rotate3d(1,0,0,45deg) 就是沿着x轴旋转45deg
+
+​	transform:rotate3d(1,1,0,45deg) 就是沿着对角线旋转45deg
+
+对于元素旋转的方向的判断我们需要先学习一个左手准则。
+
+<img src="C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20250223222709236.png" alt="image-20250223222709236" style="zoom:50%;" />
+
+左手准则
+
+左手的手拇指指向x轴的正方向
+
+其余手指的弯曲方向就是该元素沿着x轴旋转的方向
+
+##### 2.7.6 3D呈现transfrom-style
+
+控制子元素是否开启三维立体环境。
+
+transform-style: flat 子元素不开启3d立体空间默认的
+
+transform-style: preserve-3d; 子元素开启立体空间
+
+代码写给父级，但是影响的是子盒子
+
+这个属性很重要，后面必用
+
+<img src="C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20250223222936716.png" alt="image-20250223222936716" style="zoom: 50%;" />
+
+#### 2.8 浏览器私有前缀
+
+浏览器私有前缀是为了兼容老版本的写法，比较新版本的浏览器无须添加。
+
+##### 2.8.1 私有前缀
+
+-moz-：代表firefox 浏览器私有属性
+
+-ms-：代表ie 浏览器私有属性
+
+-webkit-：代表safari、chrome 私有属性
+
+-o-：代表Opera 私有属性
+
+##### 2.8.2 提倡的写法
+
+```html
+-moz-border-radius: 10px;
+-webkit-border-radius: 10px;
+-o-border-radius: 10px;
+border-radius: 10px;
+```
+
+
+
